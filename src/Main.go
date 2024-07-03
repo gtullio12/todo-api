@@ -13,13 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type User struct {
-	Id       primitive.ObjectID `bson:"_id",required`
-	Name     string             `bson:"name"`
-	Email    string             `bson:"email"`
-	Password string             `bson:"password"`
-}
-
 // Setup MongoDB client
 var collection *mongo.Collection
 var ctx = context.TODO()
@@ -42,7 +35,7 @@ func main() {
 }
 
 func connectToDatabase() (coll *mongo.Collection) {
-	clientOptions := options.Client().ApplyURI("mongodb+srv://{username}:{passowrd}@todocluser.yh1icqj.mongodb.net/?retryWrites=true&w=majority&appName=todocluser")
+	clientOptions := options.Client().ApplyURI("mongodb+srv://{username}:{password}@todocluser.yh1icqj.mongodb.net/?retryWrites=true&w=majority&appName=todocluser")
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -84,15 +77,18 @@ func editTodo(c *gin.Context) {
 	c.Bind(&todoToEdit)
 
 	update := bson.D{{"$set", bson.D{{"content", todoToEdit.Content}}}, {"$set", bson.D{{"isDone", todoToEdit.IsDone}}}}
-	res, err := coll.UpdateOne(context.TODO(), bson.D{{"_id", todoToEdit.Id}}, update)
+	_, err := coll.UpdateOne(context.TODO(), bson.D{{"_id", todoToEdit.Id}}, update)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(res)
-
 }
 
 func deleteTodo(c *gin.Context) {
+	var todoToDelete Todo
+	c.Bind(&todoToDelete)
 
+	_, err := coll.DeleteOne(context.TODO(), bson.D{{"_id", todoToDelete.Id}})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
