@@ -35,7 +35,7 @@ func main() {
 }
 
 func connectToDatabase() (coll *mongo.Collection) {
-	clientOptions := options.Client().ApplyURI("mongodb+srv://{username}:{password}@todocluser.yh1icqj.mongodb.net/?retryWrites=true&w=majority&appName=todocluser")
+	clientOptions := options.Client().ApplyURI("mongodb+srv://{}:{}@todocluser.yh1icqj.mongodb.net/?retryWrites=true&w=majority&appName=todocluser")
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
