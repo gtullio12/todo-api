@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -24,24 +26,15 @@ var ctx = context.TODO()
 var coll = connectToDatabase()
 
 type Todo struct {
-	Id      int    `json:"Id"`
-	Content string `json:"Content"`
-	IsDone  bool   `json:"IsDone"`
-}
-
-// const todos []Todo
-var todos = []Todo{
-	Todo{Id: 1, Content: "Update Documentation", IsDone: true},
-	Todo{Id: 2, Content: "Add RESTful API", IsDone: false},
-	Todo{Id: 3, Content: "Modify function parameters", IsDone: false},
-	Todo{Id: 4, Content: "Add method recievers", IsDone: true},
+	Id      primitive.ObjectID `bson:"_id"`
+	Content string             `bson:"content"`
+	IsDone  bool               `bson:"isDone"`
 }
 
 func main() {
 	router := gin.Default()
 	router.GET("/getTodos", getTodos)
-	router.GET("/getTodo", getSingleTodo)
-	router.POST("/editTodo", editTodo)
+	router.PUT("/editTodo", editTodo)
 	router.DELETE("/deleteTodo", deleteTodo)
 	router.POST("/createTodo", createTodo)
 
@@ -49,7 +42,7 @@ func main() {
 }
 
 func connectToDatabase() (coll *mongo.Collection) {
-	clientOptions := options.Client().ApplyURI("mongodb+srv://{username}:{password}@todocluser.yh1icqj.mongodb.net/?retryWrites=true&w=majority&appName=todocluser")
+	clientOptions := options.Client().ApplyURI("mongodb+srv://{username}:{passowrd}@todocluser.yh1icqj.mongodb.net/?retryWrites=true&w=majority&appName=todocluser")
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -60,21 +53,46 @@ func connectToDatabase() (coll *mongo.Collection) {
 }
 
 func createTodo(c *gin.Context) {
+	var todo Todo
+	c.Bind(&todo)
+	todo.Id = primitive.NewObjectID()
 
+	res, err := coll.InsertOne(context.TODO(), todo)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Inserted document with _id: %v\n", res.InsertedID)
 }
 
 func getTodos(c *gin.Context) {
+	var todos []Todo
+	findOptions := options.Find()
+	cursor, err := coll.Find(context.TODO(), bson.D{{}}, findOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = cursor.All(context.TODO(), &todos); err != nil {
+		log.Fatal(err)
+	}
+
 	c.IndentedJSON(http.StatusOK, todos)
 }
 
 func editTodo(c *gin.Context) {
+	var todoToEdit Todo
+	c.Bind(&todoToEdit)
+
+	update := bson.D{{"$set", bson.D{{"content", todoToEdit.Content}}}, {"$set", bson.D{{"isDone", todoToEdit.IsDone}}}}
+	res, err := coll.UpdateOne(context.TODO(), bson.D{{"_id", todoToEdit.Id}}, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(res)
 
 }
 
 func deleteTodo(c *gin.Context) {
-
-}
-
-func getSingleTodo(c *gin.Context) {
 
 }
