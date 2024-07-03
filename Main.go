@@ -36,7 +36,7 @@ func main() {
 }
 
 func connectToDatabase() (coll *mongo.Collection) {
-	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_URL"))
+	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_PRIVATE_URL"))
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
