@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -36,7 +37,9 @@ func main() {
 }
 
 func connectToDatabase() (coll *mongo.Collection) {
-	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_PRIVATE_URL"))
+	URI := strings.Replace(os.Getenv("MONGO_URL"), "<username>", os.Getenv("USERNAME"), 1)
+	URI = strings.Replace(URI, "<password>", os.Getenv("MONGODB_PASSWORD"), 1)
+	clientOptions := options.Client().ApplyURI(URI)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
