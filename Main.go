@@ -46,7 +46,7 @@ func main() {
 func connectToDatabase() (coll *mongo.Collection) {
 	URI := strings.Replace(os.Getenv("MONGO_URL"), "<username>", os.Getenv("USERNAME"), 1)
 	URI = strings.Replace(URI, "<password>", os.Getenv("MONGODB_PASSWORD"), 1)
-	clientOptions := options.Client().ApplyURI(URI)
+	clientOptions := options.Client().ApplyURI(URI + "?authSource=admin")
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
