@@ -33,7 +33,7 @@ func main() {
 	router.DELETE("/deleteTodo", deleteTodo)
 	router.POST("/createTodo", createTodo)
 
-	router.Run("todo-app-production-8c19.up.railway.app")
+	router.Run("todo-app-production-8c19.up.railway.app:8000")
 }
 
 func connectToDatabase() (coll *mongo.Collection) {
