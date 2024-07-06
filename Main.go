@@ -33,7 +33,14 @@ func main() {
 	router.DELETE("/deleteTodo", deleteTodo)
 	router.POST("/createTodo", createTodo)
 
-	router.Run("todo-app-production-8c19.up.railway.app:8000")
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "8080" // Default port for development
+	}
+
+	// Start the router
+	router.Run(":" + port)
 }
 
 func connectToDatabase() (coll *mongo.Collection) {
