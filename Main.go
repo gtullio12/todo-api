@@ -21,6 +21,7 @@ var coll = connectToDatabase()
 
 type Todo struct {
 	Id      primitive.ObjectID `bson:"_id"`
+	Title   string             `bson:"title"`
 	Content string             `bson:"content"`
 	IsDone  bool               `bson:"isDone"`
 }
@@ -84,7 +85,7 @@ func editTodo(c *gin.Context) {
 	var todoToEdit Todo
 	c.Bind(&todoToEdit)
 
-	update := bson.D{{"$set", bson.D{{"content", todoToEdit.Content}}}, {"$set", bson.D{{"isDone", todoToEdit.IsDone}}}}
+	update := bson.D{{"$set", bson.D{{"title", todoToEdit.Title}}}, {"$set", bson.D{{"content", todoToEdit.Content}}}, {"$set", bson.D{{"isDone", todoToEdit.IsDone}}}}
 	_, err := coll.UpdateOne(context.TODO(), bson.D{{"_id", todoToEdit.Id}}, update)
 	if err != nil {
 		log.Fatal(err)
