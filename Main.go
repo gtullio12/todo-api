@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/joho/godotenv"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -33,6 +36,14 @@ func main() {
 	router.DELETE("/deleteTodo", deleteTodo)
 	router.POST("/createTodo", createTodo)
 
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", os.Getenv("FRONT_END_ENDPOINT")},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Length"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
 	port := os.Getenv("PORT")
 
 	if port == "" {
@@ -44,6 +55,11 @@ func main() {
 }
 
 func connectToDatabase() (coll *mongo.Collection) {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_URL"))
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
