@@ -99,7 +99,11 @@ func getTodos(c *gin.Context) {
 
 func editTodo(c *gin.Context) {
 	var todoToEdit Todo
-	c.Bind(&todoToEdit)
+	c.BindJSON(&todoToEdit)
+
+	fmt.Println("ID --> ", todoToEdit.Id)
+	fmt.Println("Body --> ", todoToEdit.Content)
+	fmt.Println("isDone --> ", todoToEdit.IsDone)
 
 	update := bson.D{{"$set", bson.D{{"title", todoToEdit.Title}}}, {"$set", bson.D{{"content", todoToEdit.Content}}}, {"$set", bson.D{{"isDone", todoToEdit.IsDone}}}}
 	_, err := coll.UpdateOne(context.TODO(), bson.D{{"_id", todoToEdit.Id}}, update)
