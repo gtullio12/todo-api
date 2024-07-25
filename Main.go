@@ -101,10 +101,6 @@ func editTodo(c *gin.Context) {
 	var todoToEdit Todo
 	c.BindJSON(&todoToEdit)
 
-	fmt.Println("ID --> ", todoToEdit.Id)
-	fmt.Println("Body --> ", todoToEdit.Content)
-	fmt.Println("isDone --> ", todoToEdit.IsDone)
-
 	update := bson.D{{"$set", bson.D{{"title", todoToEdit.Title}}}, {"$set", bson.D{{"content", todoToEdit.Content}}}, {"$set", bson.D{{"isDone", todoToEdit.IsDone}}}}
 	_, err := coll.UpdateOne(context.TODO(), bson.D{{"_id", todoToEdit.Id}}, update)
 	if err != nil {
@@ -114,7 +110,7 @@ func editTodo(c *gin.Context) {
 
 func deleteTodo(c *gin.Context) {
 	var todoToDelete Todo
-	c.Bind(&todoToDelete)
+	c.BindJSON(&todoToDelete)
 
 	_, err := coll.DeleteOne(context.TODO(), bson.D{{"_id", todoToDelete.Id}})
 	if err != nil {
