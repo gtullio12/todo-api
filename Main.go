@@ -23,10 +23,11 @@ var ctx = context.TODO()
 var coll = connectToDatabase()
 
 type Todo struct {
-	Id      primitive.ObjectID `bson:"_id"`
-	Title   string             `bson:"title"`
-	Content string             `bson:"content"`
-	IsDone  bool               `bson:"isDone"`
+	Id        primitive.ObjectID `bson:"_id"`
+	Title     string             `bson:"title"`
+	Content   string             `bson:"content"`
+	IsDone    bool               `bson:"isDone"`
+	Workspace string             `bson:"workspace"`
 }
 
 func main() {
@@ -57,7 +58,7 @@ func main() {
 func connectToDatabase() (coll *mongo.Collection) {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_URL"))
@@ -72,7 +73,7 @@ func connectToDatabase() (coll *mongo.Collection) {
 
 func createTodo(c *gin.Context) {
 	var todo Todo
-	c.Bind(&todo)
+	c.BindJSON(&todo)
 	todo.Id = primitive.NewObjectID()
 
 	res, err := coll.InsertOne(context.TODO(), todo)
