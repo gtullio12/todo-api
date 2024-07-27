@@ -37,6 +37,8 @@ func main() {
 	router.DELETE("/deleteTodo", deleteTodo)
 	router.POST("/createTodo", createTodo)
 
+	fmt.Printf("Front end endpoint for CORS -> %v\n", os.Getenv("FRONT_END_ENDPOINT"))
+
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", os.Getenv("FRONT_END_ENDPOINT")},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
